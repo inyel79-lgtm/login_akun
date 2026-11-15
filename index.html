@@ -762,26 +762,35 @@ async function loginV3() {
   }
 }
 
-function logoutLokal() {
-  localStorage.clear(); // Hapus seluruh token & sesi di browser
-  if (document.getElementById('token')) document.getElementById('token').value = '';
-  if (document.getElementById('loginPass')) document.getElementById('loginPass').value = '';
-  
-  // Kunci kembali tampilan fitur utama saat logout
-  if (document.getElementById('areaFiturUtama')) {
-    document.getElementById('areaFiturUtama').style.display = 'none';
+// Fungsi otomatis memulihkan seluruh data sesi kapan saja
+function pulihkanSesiLokal() {
+  const tokenTersimpan = localStorage.getItem('bearer_token');
+  const nikTersimpan = localStorage.getItem('saved_nik');
+  const userIdTersimpan = localStorage.getItem('saved_user_id');
+  const unitIdTersimpan = localStorage.getItem('saved_unit_id');
+
+  if (nikTersimpan && document.getElementById('loginNik') && !document.getElementById('loginNik').value) {
+    document.getElementById('loginNik').value = nikTersimpan;
   }
-  alert('🗑️ Anda telah Logout. Silakan login kembali untuk mengakses fitur dasbor.');
+
+  if (tokenTersimpan) {
+    if (document.getElementById('bearerToken')) document.getElementById('bearerToken').value = tokenTersimpan;
+    if (userIdTersimpan && document.getElementById('userId')) document.getElementById('userId').value = userIdTersimpan;
+    if (unitIdTersimpan && document.getElementById('qrUnitId')) document.getElementById('qrUnitId').value = unitIdTersimpan;
+    if (document.getElementById('areaFiturUtama')) document.getElementById('areaFiturUtama').style.display = 'block';
+    return true;
+  }
+  return false;
 }
 
-// Cek otomatis status login setiap kali halaman dibuka/di-refresh
-window.addEventListener('DOMContentLoaded', () => {
-  const tokenTersimpan = localStorage.getItem('bearer_token');
-  const area = document.getElementById('areaFiturUtama');
-  if (tokenTersimpan && area) {
-    area.style.display = 'block';
+// Jalankan pemulihan setelah seluruh halaman selesai dimuat
+window.addEventListener('load', () => {
+  if (pulihkanSesiLokal()) {
+    log('🔄 Sesi login & NIK dipulihkan otomatis.');
+    sinkronTanggalOtomatis();
   }
 });
+
 
 </script>
 <script>
