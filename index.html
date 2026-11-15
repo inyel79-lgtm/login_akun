@@ -57,20 +57,22 @@
       <!-- KARTU 1: LOGIN AKUN PEGAWAI (SELALU TERBUKA) -->
   <div class="card config-card">
     <h3>🔐 Login Akun Pegawai (api_login_v3)</h3>
-    <div class="grid">
-      <div>
-        <label>NIK (16 Digit)</label>
-        <input type="text" id="loginNik" placeholder="Masukkan NIK">
+        <form onsubmit="event.preventDefault(); loginV3();">
+      <div class="grid">
+        <div>
+          <label>NIK (16 Digit)</label>
+          <input type="text" id="loginNik" name="username" autocomplete="username" placeholder="Masukkan NIK">
+        </div>
+        <div>
+          <label>Password</label>
+          <input type="password" id="loginPass" name="password" autocomplete="current-password" placeholder="Masukkan Password">
+        </div>
       </div>
-      <div>
-        <label>Password</label>
-        <input type="password" id="loginPass" placeholder="Masukkan Password">
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button type="submit" class="btn-green" style="flex: 2; margin: 0;">🔓 Login & Simpan Sesi</button>
+        <button type="button" class="btn-red" onclick="logoutLokal()" style="flex: 1; margin: 0;">🗑️ Logout</button>
       </div>
-    </div>
-    <div style="display: flex; gap: 10px; margin-top: 10px;">
-      <button type="button" class="btn-green" onclick="loginV3()" style="flex: 2; margin: 0;">🔓 Login & Simpan Sesi</button>
-      <button type="button" class="btn-red" onclick="logoutLokal()" style="flex: 1; margin: 0;">🗑️ Logout</button>
-    </div>
+    </form>
   </div>
 
   <!-- AREA TERKUNCI: BARU TERBUKA SETELAH LOGIN BERHASIL -->
@@ -736,6 +738,12 @@ async function loginV3() {
       if (tokenBaru) {
         if (document.getElementById('bearerToken')) document.getElementById('bearerToken').value = tokenBaru;
         localStorage.setItem('bearer_token', tokenBaru);
+                localStorage.setItem('bearer_token', tokenBaru);
+        localStorage.setItem('saved_nik', nik);
+        if (userObj) {
+          if (userObj.id) localStorage.setItem('saved_user_id', userObj.id);
+          if (userObj.id_unit) localStorage.setItem('saved_unit_id', userObj.id_unit);
+        }
 
         // Buka kunci tampilan fitur utama setelah login berhasil
         if (document.getElementById('areaFiturUtama')) {
@@ -776,10 +784,24 @@ function logoutLokal() {
 
 // Cek otomatis status login setiap kali halaman dibuka/di-refresh
 window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', () => {
   const tokenTersimpan = localStorage.getItem('bearer_token');
-  const area = document.getElementById('areaFiturUtama');
-  if (tokenTersimpan && area) {
-    area.style.display = 'block';
+  const nikTersimpan = localStorage.getItem('saved_nik');
+  const userIdTersimpan = localStorage.getItem('saved_user_id');
+  const unitIdTersimpan = localStorage.getItem('saved_unit_id');
+
+  if (nikTersimpan && document.getElementById('loginNik')) {
+    document.getElementById('loginNik').value = nikTersimpan;
+  }
+
+  if (tokenTersimpan) {
+    if (document.getElementById('bearerToken')) document.getElementById('bearerToken').value = tokenTersimpan;
+    if (userIdTersimpan && document.getElementById('userId')) document.getElementById('userId').value = userIdTersimpan;
+    if (unitIdTersimpan && document.getElementById('qrUnitId')) document.getElementById('qrUnitId').value = unitIdTersimpan;
+    if (document.getElementById('areaFiturUtama')) document.getElementById('areaFiturUtama').style.display = 'block';
+    
+    log('🔄 Sesi login dipulihkan otomatis dari penyimpanan browser.');
+    sinkronTanggalOtomatis();
   }
 });
 
