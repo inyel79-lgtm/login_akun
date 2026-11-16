@@ -625,79 +625,7 @@ async function loginV3() {
   const headersLogin = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
-    'x-install-id': '196a92ddad0a3c085da3980264ef91d9ea45a60cd7ea796f',
-    'x-device-platform': 'android',
-    'x-app-installer': 'com.android.vending',
-    'x-device-id': '40622cf44ad36bb1',
-    'x-app-package': 'com.digitalnative.atei_bartim'
-  };
-
-  const payload = {
-    nik: nik,
-    password: password,
-    device: {
-      install_id: headersLogin['x-install-id'],
-      platform: headersLogin['x-device-platform'],
-      device_id: headersLogin['x-device-id'],
-      package_name: headersLogin['x-app-package'],
-      installer_package_name: headersLogin['x-app-installer'],
-      is_expected_package: true
-    }
-  };
-
-  log(`🚀 Mengirim permintaan Login ke ${baseUrl}/api_login_v3...`);
-
-  try {
-    const res = await fetch(`${baseUrl}/api_login_v3`, {
-      method: 'POST',
-      headers: headersLogin,
-      body: JSON.stringify(payload)
-    });
-
-    const json = await res.json();
-    const isSukses = res.ok && json.success !== false && (!json.data || json.data.success !== false);
-
-    if (isSukses) {
-      const tokenBaru = json.token || (json.data && json.data.token) || json.access_token;
-      const userObj = (json.data && json.data.user) || json.user;
-
-      if (tokenBaru) {
-        if (document.getElementById('token')) document.getElementById('token').value = tokenBaru;
-        localStorage.setItem('bearer_token', tokenBaru);
-
-        if (userObj) {
-          if (userObj.id && document.getElementById('userId')) document.getElementById('userId').value = userObj.id;
-          if (userObj.id_unit && document.getElementById('qrUnitId')) document.getElementById('qrUnitId').value = userObj.id_unit;
-          log(`✅ Login Berhasil! Halo, ${userObj.name || 'Pegawai'} (ID: ${userObj.id}, Unit: ${userObj.id_unit})`);
-        } else {
-          log(`✅ Login Berhasil! Token sesi tersimpan.`);
-        }
-        sinkronTanggalOtomatis();
-      } else {
-        log(`⚠️ Token tidak ditemukan di respon:\n${JSON.stringify(json, null, 2)}`);
-      }
-    } else {
-      const pesanError = (json.data && json.data.message) || json.message || 'Login ditolak server';
-      log(`❌ Gagal Login: ${pesanError}`);
-    }
-  } catch (e) {
-    log(`❌ Gagal terhubung saat login: ${e.message}`);
-  }
-}
-async function loginV3() {
-  const nik = val('loginNik').trim();
-  const password = val('loginPass');
-  if (!nik || !password) {
-    log('⚠️ Harap isi NIK dan Password terlebih dahulu!');
-    return;
-  }
-
-  const baseUrl = val('baseUrl').replace(/\/$/, '');
-
-  const headersLogin = {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'x-install-id': '196a92ddad0a3c085da3980264ef91d9ea45a60cd7ea796f',
+    'x-install-id': '196a92ddad0a3c085da3980264cf91d9ca45a60cd7ea796f',
     'x-device-platform': 'android',
     'x-app-installer': 'com.android.vending',
     'x-device-id': '40622cf44ad36bb1',
@@ -735,6 +663,7 @@ async function loginV3() {
 
       if (tokenBaru) {
         if (document.getElementById('bearerToken')) document.getElementById('bearerToken').value = tokenBaru;
+        if (document.getElementById('token')) document.getElementById('token').value = tokenBaru;
         localStorage.setItem('bearer_token', tokenBaru);
 
         // Buka kunci tampilan fitur utama setelah login berhasil
@@ -743,12 +672,19 @@ async function loginV3() {
         }
 
         if (userObj) {
-          if (userObj.id && document.getElementById('userId')) document.getElementById('userId').value = userObj.id;
-          if (userObj.id_unit && document.getElementById('qrUnitId')) document.getElementById('qrUnitId').value = userObj.id_unit;
+          if (userObj.id) {
+            localStorage.setItem('saved_user_id', userObj.id);
+            if (document.getElementById('userId')) document.getElementById('userId').value = userObj.id;
+          }
+          if (userObj.id_unit) {
+            localStorage.setItem('saved_unit_id', userObj.id_unit);
+            if (document.getElementById('qrUnitId')) document.getElementById('qrUnitId').value = userObj.id_unit;
+          }
           log(`✅ Login Berhasil! Halo, ${userObj.name || 'Pegawai'} (ID: ${userObj.id}, Unit: ${userObj.id_unit})`);
         } else {
-          log(`✅ Login Berhasil! bearerToken sesi tersimpan.`);
+          log('✅ Login Berhasil! BearerToken sesi tersimpan.');
         }
+
         sinkronTanggalOtomatis();
       } else {
         log(`⚠️ Token tidak ditemukan di respon:\n${JSON.stringify(json, null, 2)}`);
@@ -763,23 +699,34 @@ async function loginV3() {
 }
 
 function logoutLokal() {
-  localStorage.clear(); // Hapus seluruh token & sesi di browser
+  localStorage.clear();
+  if (document.getElementById('bearerToken')) document.getElementById('bearerToken').value = '';
   if (document.getElementById('token')) document.getElementById('token').value = '';
+  if (document.getElementById('userId')) document.getElementById('userId').value = '';
   if (document.getElementById('loginPass')) document.getElementById('loginPass').value = '';
-  
+
   // Kunci kembali tampilan fitur utama saat logout
   if (document.getElementById('areaFiturUtama')) {
     document.getElementById('areaFiturUtama').style.display = 'none';
   }
+
   alert('🗑️ Anda telah Logout. Silakan login kembali untuk mengakses fitur dasbor.');
 }
 
-// Cek otomatis status login setiap kali halaman dibuka/di-refresh
+// Cek otomatis status login setiap kali halaman dibuka / di-refresh
 window.addEventListener('DOMContentLoaded', () => {
   const tokenTersimpan = localStorage.getItem('bearer_token');
+  const userIdTersimpan = localStorage.getItem('saved_user_id');
+  const unitIdTersimpan = localStorage.getItem('saved_unit_id');
   const area = document.getElementById('areaFiturUtama');
-  if (tokenTersimpan && area) {
-    area.style.display = 'block';
+
+  if (tokenTersimpan) {
+    if (document.getElementById('bearerToken')) document.getElementById('bearerToken').value = tokenTersimpan;
+    if (document.getElementById('token')) document.getElementById('token').value = tokenTersimpan;
+    if (userIdTersimpan && document.getElementById('userId')) document.getElementById('userId').value = userIdTersimpan;
+    if (unitIdTersimpan && document.getElementById('qrUnitId')) document.getElementById('qrUnitId').value = unitIdTersimpan;
+    if (area) area.style.display = 'block';
+    sinkronTanggalOtomatis();
   }
 });
 
