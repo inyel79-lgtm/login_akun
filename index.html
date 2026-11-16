@@ -76,7 +76,7 @@
   <!-- AREA TERKUNCI: BARU TERBUKA SETELAH LOGIN BERHASIL -->
   <div id="areaFiturUtama" style="display: none;">
     <div class="card config-card">
-      <h2>🔑 Konfigurasi Token, Device ID & Web QR</h2>
+      <h2>🔑 Konfigurasi User ID & ID Unit</h2>
         <!-- Base URL tetap disimpan secara tersembunyi -->
     <div style="display: none;">
     <label>Base URL API</label>
@@ -148,7 +148,7 @@
                 <input type="text" id="autoTanggal" readonly>
             </div>
             <div class="form-group">
-                <label>Token Hash QR (Tempel Hasil QR / Otomatis)</label>
+                <label>Token Hash QR (Otomatis)</label>
                 <input type="text" id="qrHash" value="34a08fca2e" oninput="updatePreviewQr()">
             </div>
         </div>
@@ -163,8 +163,7 @@
             </div>
         </div>
 
-        <button type="button" class="btn-red" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="ambilGpsAsli()">📍 Ambil GPS Browser</button>
-        <button type="button" class="btn-amber" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="verifikasiLokasi()">1. Verifikasi Lokasi</button>
+        <button type="button" class="btn-red" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="verifikasiLokasi()">1. Verifikasi Lokasi</button>
         <button type="button" class="btn-green" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="kirimQrIn()">2. Kirim Check-In</button>
         <button type="button" class="btn-purple" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="kirimQrOut()">3. Kirim Check-Out</button>
          <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="(async () => {
