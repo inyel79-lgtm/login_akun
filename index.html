@@ -341,7 +341,7 @@ async function sinkronTanggalOtomatis() {
 
       if (jamWib >= 7 && jamWib < 9 && unit.qr_in) {
         document.getElementById('qrHash').value = unit.qr_in;
-        log(`🔑 [OTOMATIS] QR Check-In (07-12 WIB) Unit ${targetUnitId}: ${unit.qr_in}`);
+        log(`🔑 [OTOMATIS] QR Check-In (07-9 WIB) Unit ${targetUnitId}: ${unit.qr_in}`);
       } else if (jamWib >= 16 && jamWib < 17 && unit.qr_out) {
         document.getElementById('qrHash').value = unit.qr_out;
         log(`🔑 [OTOMATIS] QR Check-Out (16-17 WIB) Unit ${targetUnitId}: ${unit.qr_out}`);
