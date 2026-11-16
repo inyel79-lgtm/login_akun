@@ -264,7 +264,7 @@ log(`🏁 Pemindaian selesai! Ditemukan ${ditemukan} endpoint aktif baru.`);
         <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekProfil()">Cek Profil Pegawai</button>
         <button type="button" class="btn-gray" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekVersi()">Cek Versi API</button>
         <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekSesiPerangkat()">🔑 Cek Sesi Perangkat</button> 
-        <button type="button" class="btn-amber" style="width: 100%; padding: 16px 24px; font-size: 16px; margin-top: 8px;" onclick="prosesRefreshToken()">🔄 Refresh Token</button>
+        <button type="button" class="btn-amber" style="width: 100%; padding: 14px; font-size: 15px; margin-top: 8px;" onclick="refreshTokenOtomatis()">🔄 Refresh Token Sesi</button>
         </div>
 
     <!-- 3. REKAPITULASI & NILAI TPP -->
@@ -527,6 +527,40 @@ function cekRekapV2() {
         id: parseInt(val('userId')),
         date: tanggalAwalBulan
     });
+}
+async function refreshTokenOtomatis() {
+  const baseUrl = val('baseUrl').replace(/\/$/, '');
+  log('🔄 Memeriksa pembaruan token sesi...');
+
+  try {
+    // 1. Coba rute /refresh terlebih dahulu dengan membawa token lama
+    const res = await fetch(`${baseUrl}/refresh`, {
+      method: 'POST',
+      headers: getHeaders()
+    });
+
+    if (res.ok) {
+      const json = await res.json();
+      const tokenBaru = json.token || (json.data && json.data.token) || json.access_token;
+      if (tokenBaru) {
+        localStorage.setItem('bearer_token', tokenBaru);
+        if (document.getElementById('bearerToken')) document.getElementById('bearerToken').value = tokenBaru;
+        if (document.getElementById('auth_token')) document.getElementById('auth_token').value = tokenBaru;
+        log('✅ Token berhasil diperbarui melalui /refresh!');
+        return;
+      }
+    }
+
+    // 2. Jika rute /refresh tidak ada (404/405), jalankan ulang login otomatis
+    log('ℹ️ Rute /refresh tidak tersedia, menjalankan ulang proses login sesi...');
+    if (typeof loginV3 === 'function') {
+      await loginV3();
+    } else if (typeof prosesLoginV3 === 'function') {
+      await prosesLoginV3();
+    }
+  } catch (e) {
+    log(`❌ Gagal memperbarui token: ${e.message}`);
+  }
 }
 
 function prosesRefreshToken() {
