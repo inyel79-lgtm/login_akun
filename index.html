@@ -399,8 +399,8 @@ function getHeaders(withAuth = true) {
 
 async function callApi(method, path, body = null, withAuth = true) {
     const url = `${val('baseUrl').replace(/\/$/, '')}${path}`;
-    log(`➡️ ${method} ${url}` + (body ? `
-Payload: ${JSON.stringify(body)}` : ''));
+    //log(`➡️ ${method} ${url}` + (body ? `
+//Payload: ${JSON.stringify(body)}` : ''));
 
     try {
         const options = {
