@@ -316,6 +316,21 @@ async function sinkronTanggalOtomatis() {
 
   const targetUnitId = parseInt(val('qrUnitId')) || 31;
   try {
+    // 1. Ambil waktu resmi dari server
+    let waktuAcuan = new Date();
+    try {
+      const resTime = await fetch('https://presensi.baritotimurkab.go.id/api/check-server-time');
+            if (resTime.ok) {
+        const dataTime = await resTime.json();
+        if (dataTime.server_timestamp) {
+          waktuAcuan = new Date(dataTime.server_timestamp * 1000);
+        }
+      }
+    } catch (errTime) {
+      // Jika gagal memuat waktu server, otomatis gunakan waktu perangkat sebagai cadangan
+    }
+
+    // 2. Ambil data unit & token QR
     const baseUrl = val('baseUrl').replace(/\/$/, '');
     const res = await fetch(`${baseUrl}/unit`, { headers: getHeaders(true) });
     const json = await res.json();
@@ -327,21 +342,32 @@ async function sinkronTanggalOtomatis() {
         timeZone: 'Asia/Jakarta',
         hour: '2-digit',
         hour12: false
-      }).format(new Date()), 10);
+      }).format(waktuAcuan), 10);
 
-      if (jamWib >= 7 && jamWib < 8 && unit.qr_in) {
+      const qrLama = document.getElementById('qrHash').value;
+
+      // Jadwal normal: 07:00-12:59 (In) dan 16:00-16:59 (Out)
+      if (jamWib >= 7 && jamWib < 12 && unit.qr_in) {
         document.getElementById('qrHash').value = unit.qr_in;
-        log(`🔑 [OTOMATIS] QR Check-In (07-08 WIB) Unit ${targetUnitId}: ${unit.qr_in}`);
+        if (qrLama !== unit.qr_in) {
+          log(`🔑 [SERVER TIME] QR Check-In (07-08 WIB) Unit ${targetUnitId}: ${unit.qr_in}`);
+        }
       } else if (jamWib >= 16 && jamWib < 17 && unit.qr_out) {
         document.getElementById('qrHash').value = unit.qr_out;
-        log(`🔑 [OTOMATIS] QR Check-Out (16-17 WIB) Unit ${targetUnitId}: ${unit.qr_out}`);
+        if (qrLama !== unit.qr_out) {
+          log(`🔑 [SERVER TIME] QR Check-Out (16-17 WIB) Unit ${targetUnitId}: ${unit.qr_out}`);
+        }
       } else {
-      if (document.getElementById('qrHash').value !== '') {
-       document.getElementById('qrHash').value = '';
-    const jamMenitWib = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }).format(new Date());
-    log(`⏰[INFO] Di luar jam presensi 07:00-08:00 & 16:00-17:00 (Sekarang ${jamMenitWib} WIB). Token QR dikosongkan🙏.`);
-  }
-}
+        if (qrLama !== '') {
+          document.getElementById('qrHash').value = '';
+          const jamMenitWib = new Intl.DateTimeFormat('id-ID', {
+            timeZone: 'Asia/Jakarta',
+            hour: '2-digit',
+            minute: '2-digit'
+          }).format(waktuAcuan);
+          log(`[INFO] Di luar jam presensi 07:00-08:00/16:00-17:00 (Server: ${jamMenitWib} WIB). Token QR dikosongkan.`);
+        }
+      }
       updatePreviewQr();
     }
   } catch (e) {
