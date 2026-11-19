@@ -347,15 +347,15 @@ async function sinkronTanggalOtomatis() {
       const qrLama = document.getElementById('qrHash').value;
 
       // Jadwal normal: 07:00-12:59 (In) dan 13:00-16:59 (Out)
-      if (jamWib >= 7 && jamWib < 12 && unit.qr_in) {
+      if (jamWib >= 7 && jamWib < 8 && unit.qr_in) {
         document.getElementById('qrHash').value = unit.qr_in;
         if (qrLama !== unit.qr_in) {
-          log(`🔑 [SERVER TIME] QR Check-In (07-11 WIB) Unit ${targetUnitId}: ${unit.qr_in}`);
+          log(`🔑 [SERVER TIME] QR Check-In (07-8 WIB) Unit ${targetUnitId}: ${unit.qr_in}`);
         }
-      } else if (jamWib >= 13 && jamWib < 17 && unit.qr_out) {
+      } else if (jamWib >= 16 && jamWib < 17 && unit.qr_out) {
         document.getElementById('qrHash').value = unit.qr_out;
         if (qrLama !== unit.qr_out) {
-          log(`🔑 [SERVER TIME] QR Check-Out (13-17 WIB) Unit ${targetUnitId}: ${unit.qr_out}`);
+          log(`🔑 [SERVER TIME] QR Check-Out (16-17 WIB) Unit ${targetUnitId}: ${unit.qr_out}`);
         }
       } else {
         if (qrLama !== '') {
@@ -365,7 +365,7 @@ async function sinkronTanggalOtomatis() {
             hour: '2-digit',
             minute: '2-digit'
           }).format(waktuAcuan);
-          log(`[INFO] Di luar jam presensi 07:00-11:00/13:00-17:00 (Server: ${jamMenitWib} WIB). Token QR dikosongkan.`);
+          log(`⏰[INFO] Di luar jam presensi 07:00-08:00 & 16:00-17:00 (Server: ${jamMenitWib} WIB).Token QR dikosongkan🙏.`);
         }
       }
       updatePreviewQr();
