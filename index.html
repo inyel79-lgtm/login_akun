@@ -19,8 +19,41 @@
   label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #cbd5e1; }
   input[type="text"], input[type="number"], input[type="password"] { width: 100%; padding: 8px 10px; border: 1px solid #475569; background: #0f172a; color: #f8fafc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
   input[readonly] { background-color: #334155; color: #94a3b8; font-weight: 600; }
-  button { background: #2563eb; color: #fff; border: none; padding: 9px 15px; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 13px; margin-top: 4px; margin-right: 6px; }
-  button:hover { background: #1e40af; }
+      button {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 9px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 13px;
+    margin-top: 0 !important;
+    margin-bottom: 14px !important;
+    margin-right: 6px;
+    
+    /* Efek timbul 3D & bayangan lembut */
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.45), 0 8px 15px rgba(0, 0, 0, 0.35);
+    
+    /* Transisi membal (bouncy) yang hidup */
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease, filter 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:hover {
+    filter: brightness(1.06);
+  }
+
+  /* Efek tombol amblas ke bawah saat jari menekan */
+  button:active {
+    transform: translateY(4px) scale(0.96);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.45), 0 2px 5px rgba(0, 0, 0, 0.3);
+    filter: brightness(0.9);
+  }
+
+  button:last-child {
+    margin-bottom: 0 !important;
+  }
   .btn-green { background: #059669; }
   .btn-purple { background: #7c3aed; }
   .btn-amber { background: #d97706; }
@@ -166,95 +199,16 @@
     const ketemu = list.find(u => parseInt(u.id) === targetId);
     log(`⬅️ Hasil Unit ID ${targetId}:\n` + JSON.stringify(ketemu || 'ID tidak ditemukan', null, 2));
 })()">🏢 Cek Detail 1 Unit Kerja</button>
-        <button type="button" class="btn-amber" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="(async () => {
-    const baseUrl = document.getElementById('baseUrl').value.trim();
-    const token = document.getElementById('bearerToken').value.trim();
-    const deviceId = document.getElementById('deviceId').value.trim();
-    const konsol = document.querySelector('.console');
-    const log = (t) => { if(konsol){ konsol.textContent += t + '\n'; konsol.scrollTop = konsol.scrollHeight; } };
-
-    const kandidatRute = [
-  // Kategori Izin, Cuti & Dinas Luar
-  { u: '/user/izin', m: 'POST' }, { u: '/user/get_izin', m: 'POST' }, { u: '/user/history_izin', m: 'POST' },
-  { u: '/user/pengajuan_izin', m: 'POST' }, { u: '/user/izin_v2', m: 'POST' },
-  { u: '/user/cuti', m: 'POST' }, { u: '/user/get_cuti', m: 'POST' }, { u: '/user/history_cuti', m: 'POST' },
-  { u: '/user/pengajuan_cuti', m: 'POST' }, { u: '/user/cuti_v2', m: 'POST' },
-  { u: '/user/dinas_luar', m: 'POST' }, { u: '/user/dl', m: 'POST' }, { u: '/user/get_dl', m: 'POST' },
-  { u: '/user/sakit', m: 'POST' }, { u: '/user/get_sakit', m: 'POST' },
-  { u: '/user/keterangan', m: 'GET' }, { u: '/keterangan', m: 'GET' }, { u: '/jenis_izin', m: 'GET' },
-
-  // Kategori Jadwal, Libur & Rekap
-  { u: '/user/jadwal', m: 'GET' }, { u: '/user/get_jadwal', m: 'POST' }, { u: '/user/jadwal_kerja', m: 'GET' },
-  { u: '/jam_kerja', m: 'GET' }, { u: '/hari_libur', m: 'GET' }, { u: '/libur', m: 'GET' },
-  { u: '/user/rekap_harian', m: 'POST' }, { u: '/user/rekap_bulanan', m: 'POST' },
-  { u: '/user/get_rekap_bulanan', m: 'POST' }, { u: '/user/get_rekap_bulanan_v3', m: 'POST' },
-  { u: '/user/history_v2', m: 'POST' }, { u: '/user/get_history_v2', m: 'GET' },
-
-  // Kategori TPP & Kinerja
-  { u: '/user/tpp', m: 'POST' }, { u: '/user/get_tpp', m: 'POST' }, { u: '/user/get_tpp_v2', m: 'POST' },
-  { u: '/user/nilai_tpp', m: 'POST' }, { u: '/user/kinerja', m: 'POST' },
-
-  // Kategori Profil, Keamanan & Pengaturan
-  { u: '/user/update_profile', m: 'POST' }, { u: '/user/edit_profile', m: 'POST' },
-  { u: '/user/ganti_password', m: 'POST' }, { u: '/user/change_password', m: 'POST' }, { u: '/user/update_password', m: 'POST' },
-  { u: '/user/upload_foto', m: 'POST' }, { u: '/user/update_foto', m: 'POST' },
-  { u: '/user/notifikasi', m: 'GET' }, { u: '/notifikasi', m: 'GET' }, { u: '/user/notif', m: 'GET' },
-  { u: '/user/log', m: 'GET' }, { u: '/user/aktivitas', m: 'GET' },
-  { u: '/setting', m: 'GET' }, { u: '/settings', m: 'GET' }, { u: '/config', m: 'GET' },
-  { u: '/app_version', m: 'GET' }, { u: '/cek_versi', m: 'GET' }, { u: '/version_v2', m: 'GET' },
-
-  // Kategori Presensi Alternatif
-  { u: '/user/qr_in_v2', m: 'POST' }, { u: '/user/qr_out_v2', m: 'POST' },
-  { u: '/user/absen_wfh', m: 'POST' }, { u: '/user/wfh', m: 'POST' },
-  { u: '/user/apel', m: 'POST' }, { u: '/user/qr_apel', m: 'POST' },
-  { u: '/user/lembur', m: 'POST' }, { u: '/user/qr_lembur', m: 'POST' }
-];
-
-log(`🔎 Memulai pemindaian ${kandidatRute.length} kandidat rute API (hanya menampilkan yang aktif)...`);
-let ditemukan = 0;
-
-for (const item of kandidatRute) {
-  try {
-    const opsi = {
-      method: item.m,
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'x-device-id': deviceId,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    };
-    if (item.m === 'POST') {
-      opsi.body = JSON.stringify({ id: parseInt(val('userId')) || 2682 });
-    }
-    const r = await fetch(baseUrl + item.u, opsi);
-    if (r.status !== 404) {
-      ditemukan++;
-      let ket = '';
-      if (r.status === 200) ket = '✅ AKTIF (200 OK)';
-      else if (r.status === 422) ket = '🟡 AKTIF - Butuh Form Data (422)';
-      else if (r.status === 405) ket = '🟠 ADA - Ganti Metode GET/POST (405)';
-      else if (r.status === 401) ket = '🔒 Token Kedaluwarsa (401)';
-      else ket = `ℹ️ Status ${r.status}`;
-
-      log(`[${r.status}] ${item.m} ${item.u} -> ${ket}`);
-    }
-  } catch (e) {
-    // Abaikan error jaringan per item agar lanjut memindai
-  }
-}
-log(`🏁 Pemindaian selesai! Ditemukan ${ditemukan} endpoint aktif baru.`);
-})()">🔍 Scan Semua Rute API</button>
         </div>
 
     <!-- 2. CEK STATUS HARI INI, PROFIL & VERSI -->
     <div class="card">
         <h2>👤 2. Data Pegawai & Status Kehadiran Hari Ini</h2>
-        <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekToday()">Cek Absen Hari Ini</button>
-        <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekProfil()">Cek Profil Pegawai</button>
-        <button type="button" class="btn-gray" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekVersi()">Cek Versi API</button>
-        <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekSesiPerangkat()">🔑 Cek Sesi Perangkat</button> 
-        <button type="button" class="btn-amber" style="width: 100%; padding: 14px; font-size: 15px; margin-top: 8px;" onclick="refreshTokenOtomatis()">🔄 Refresh Token Sesi</button>
+        <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px; background-color: #C0C0C0; color: #000000; border: 1px solid #A9A9A9; border-radius: 6px; cursor: pointer;" onclick="cekToday()">Cek Absen Hari Ini</button>
+       <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px; background-color: #FFD700; color: #000000; border: 1px solid #E6C200; border-radius: 6px; cursor: pointer;" onclick="cekProfil()">Cek Profil Pegawai</button>
+        <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px; background-color: #FF69B4 !important; color: #000000 !important; border: 1px solid #FF1493; border-radius: 6px; cursor: pointer;" onclick="cekVersi()">Cek Versi API</button>
+        <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px; background-color: #39FF14 !important; color: #000000 !important; border: 1px solid #28B463; border-radius: 6px; cursor: pointer;" onclick="cekSesiPerangkat()">🔑 Cek Sesi Perangkat</button>
+       <button type="button" class="btn-amber" style="width: 100%; padding: 14px; font-size: 15px; margin-top: 8px; background-color: #FFC107 !important; color: #000000 !important; border: 1px solid #E0A800; border-radius: 6px; cursor: pointer;" onclick="refreshTokenOtomatis()">🔄 Refresh Token Sesi</button>
         </div>
 
     <!-- 3. REKAPITULASI & NILAI TPP -->
@@ -270,7 +224,7 @@ log(`🏁 Pemindaian selesai! Ditemukan ${ditemukan} endpoint aktif baru.`);
                 <input type="number" id="tahun">
             </div>
         </div>
-        <button type="button" class="btn-purple" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekRekapV2()">Cek Rekap Bulanan V2</button>
+        <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px; background-color: #8B4513 !important; color: #FFFFFF !important; border: 1px solid #5C2E0D; border-radius: 6px; cursor: pointer;" onclick="cekRekapV2()">Cek Rekap Bulanan V2</button>
         <button type="button" class="btn-green" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekTpp()">Cek Nilai TPP</button
      </div>
 </div>
