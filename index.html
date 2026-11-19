@@ -380,11 +380,11 @@ sinkronTanggalOtomatis();
 // Tambahan: Cek dan perbarui token QR otomatis setiap 20 detik (20.000 ms)
 setInterval(() => {
   sinkronTanggalOtomatis();
-}, 20000);
+}, 30000);
 
 function pakaiDeviceAndroid() {
-    document.getElementById('deviceId').value = '40622cf44ad36bb1';
-    log('🔄 x-device-id diubah ke ID Android: 40622cf44ad36bb1');
+    document.getElementById('deviceId').value = '';
+    log('🔄 x-device-id diubah ke ID Android:');
 }
 
 function pakaiDeviceWeb() {
