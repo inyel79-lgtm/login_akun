@@ -329,17 +329,19 @@ async function sinkronTanggalOtomatis() {
         hour12: false
       }).format(new Date()), 10);
 
-      if (jamWib >= 07 && jamWib < 08 && unit.qr_in) {
+      if (jamWib >= 07 && jamWib < 10 && unit.qr_in) {
         document.getElementById('qrHash').value = unit.qr_in;
-        log(`🔑 [OTOMATIS] QR Check-In (07-08 WIB) Unit ${targetUnitId}: ${unit.qr_in}`);
+        log(`🔑 [OTOMATIS] QR Check-In (07-10 WIB) Unit ${targetUnitId}: ${unit.qr_in}`);
       } else if (jamWib >= 16 && jamWib < 17 && unit.qr_out) {
         document.getElementById('qrHash').value = unit.qr_out;
         log(`🔑 [OTOMATIS] QR Check-Out (16-17 WIB) Unit ${targetUnitId}: ${unit.qr_out}`);
       } else {
-        document.getElementById('qrHash').value = '';
-        const jamMenitWib = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }).format(new Date());
-log(`⏰ [INFO] Di luar jam presensi 07:00-08:00/16:00-17:00 (Sekarang ${jamMenitWib} WIB), Token QR dikosongkan🙏.`);
-      }
+      if (document.getElementById('qrHash').value !== '') {
+       document.getElementById('qrHash').value = '';
+    const jamMenitWib = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }).format(new Date());
+    log(`[INFO] Di luar jam presensi 07:00-10:00/16:00-17:00 (Sekarang ${jamMenitWib} WIB). Token QR dikosongkan.`);
+  }
+}
       updatePreviewQr();
     }
   } catch (e) {
@@ -348,6 +350,11 @@ log(`⏰ [INFO] Di luar jam presensi 07:00-08:00/16:00-17:00 (Sekarang ${jamMeni
 }
 
 sinkronTanggalOtomatis();
+
+// Tambahan: Cek dan perbarui token QR otomatis setiap 20 detik (20.000 ms)
+setInterval(() => {
+  sinkronTanggalOtomatis();
+}, 20000);
 
 function pakaiDeviceAndroid() {
     document.getElementById('deviceId').value = '40622cf44ad36bb1';
