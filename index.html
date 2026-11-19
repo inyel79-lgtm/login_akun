@@ -339,7 +339,7 @@ async function sinkronTanggalOtomatis() {
       if (document.getElementById('qrHash').value !== '') {
        document.getElementById('qrHash').value = '';
     const jamMenitWib = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }).format(new Date());
-    log(`[INFO] Di luar jam presensi 07:00-08:00/16:00-17:00 (Sekarang ${jamMenitWib} WIB). Token QR dikosongkan.`);
+    log(`⏰[INFO] Di luar jam presensi 07:00-08:00 & 16:00-17:00 (Sekarang ${jamMenitWib} WIB). Token QR dikosongkan🙏.`);
   }
 }
       updatePreviewQr();
